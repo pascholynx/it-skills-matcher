@@ -10,7 +10,7 @@ export function useAuth() {
       try {
         const user = await getUserProfile();
         setIsAuthenticated(!!user);
-      } catch (error) {
+      } catch (_error) {
         setIsAuthenticated(false);
       } finally {
         setIsLoading(false);
