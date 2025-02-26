@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { getCourses } from '@/lib/api';
 import { Button } from "@/components/ui/button";
 import { useRouter } from 'next/navigation';
-const router = useRouter();
 
 interface Course {
   title: string;
@@ -18,6 +17,7 @@ export default function ResultsList() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [debugInfo, setDebugInfo] = useState<string[]>([]);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchCourses = async () => {
