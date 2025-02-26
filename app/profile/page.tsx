@@ -25,7 +25,7 @@ export default function ProfilePage() {
   const [isEditingSkills, setIsEditingSkills] = useState(false);
 
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (isAuthenticated === false) {
       router.push('/login');
       return;
     }
@@ -36,7 +36,8 @@ export default function ProfilePage() {
         setProfile(data);
         setUsername(data.username);
         setEmail(data.email);
-      } catch (_err) {
+      } catch (err) {
+         console.error(err);
         setError('Failed to load profile');
       }
     };
@@ -47,7 +48,7 @@ export default function ProfilePage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const updates: Partial<Profile> = { username, email };
+      const updates: Partial<Profile> & { password?: string } = { username, email };
       if (password) updates.password = password;
       
       await updateProfile(updates);
@@ -60,6 +61,7 @@ export default function ProfilePage() {
     }
   };
 
+  if (isAuthenticated === undefined) return <div>Loading...</div>;
   if (!profile) return <div>Loading...</div>;
 
   return (
@@ -115,11 +117,11 @@ export default function ProfilePage() {
           </Button>
         </div>
         
-        {isEditingSkills ? (
+        {isEditingSkills && profile ? (
           <SkillSelector initialSkills={profile.selectedSkills} />
         ) : (
           <div className="flex flex-wrap gap-2">
-            {profile.selectedSkills.map(skill => (
+            {profile?.selectedSkills?.map(skill => (
               <div key={skill} className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full">
                 {skill}
               </div>

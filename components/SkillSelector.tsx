@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -10,17 +10,19 @@ const AVAILABLE_SKILLS = [
   'Java', 'C++', 'AWS', 'Docker', 'Git'
 ];
 
-export default function SkillSelector() {
-  const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
+interface SkillSelectorProps {
+  initialSkills: string[];
+}
+
+export default function SkillSelector({ initialSkills }: SkillSelectorProps) {
+  const [selectedSkills, setSelectedSkills] = useState<string[]>(initialSkills || []);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const toggleSkill = (skill: string) => {
-    setSelectedSkills(prev => 
-      prev.includes(skill) 
-        ? prev.filter(s => s !== skill)
-        : [...prev, skill]
+    setSelectedSkills(prev =>
+      prev.includes(skill) ? prev.filter(s => s !== skill) : [...prev, skill]
     );
   };
 
@@ -57,8 +59,8 @@ export default function SkillSelector() {
       </div>
 
       {error && <div className="text-red-500">{error}</div>}
-      
-      <Button 
+
+      <Button
         onClick={handleSubmit}
         disabled={selectedSkills.length === 0 || loading}
         className="w-full"
