@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react';
 import { getCourses } from '@/lib/api';
 import { Button } from "@/components/ui/button";
+import { useRouter } from 'next/navigation';
+const router = useRouter();
 
 interface Course {
   title: string;
@@ -36,13 +38,24 @@ export default function ResultsList() {
           try {
             setDebugInfo(prev => [...prev, `Fetching courses for ${skill}`]);
             const skillCourses = await getCourses(skill);
+        
+            // Validate that skillCourses is an array before proceeding
+            if (!Array.isArray(skillCourses)) {
+              throw new Error(`Invalid response for ${skill}`);
+            }
+        
             setDebugInfo(prev => [...prev, `Received ${skillCourses.length} courses for ${skill}`]);
             courseData[skill] = skillCourses;
           } catch (error) {
             hasError = true;
-            setDebugInfo(prev => [...prev, `Error for ${skill}: ${error.message}`]);
+            if (error instanceof Error) {
+              setDebugInfo(prev => [...prev, `Error for ${skill}: ${error.message}`]);
+            } else {
+              setDebugInfo(prev => [...prev, `Error for ${skill}: ${String(error)}`]);
+            }
           }
         }
+        
 
         if (Object.keys(courseData).length === 0 && hasError) {
           setError('Failed to load courses. Please try again.');
@@ -94,9 +107,7 @@ export default function ResultsList() {
     return (
       <div className="text-center p-8">
         <p className="mb-4">No courses found for your selected skills.</p>
-        <Button onClick={() => window.location.href = '/select-skills'}>
-          Select Skills
-        </Button>
+        <Button onClick={() => router.push('/select-skills')}>Select Skills</Button>
       </div>
     );
   }
