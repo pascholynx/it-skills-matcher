@@ -36,7 +36,7 @@ export default function ProfilePage() {
         setProfile(data);
         setUsername(data.username);
         setEmail(data.email);
-      } catch (err) {
+      } catch (_err) {
         setError('Failed to load profile');
       }
     };
@@ -47,7 +47,7 @@ export default function ProfilePage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const updates: any = { username, email };
+      const updates: Partial<Profile> = { username, email };
       if (password) updates.password = password;
       
       await updateProfile(updates);
