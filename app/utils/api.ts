@@ -1,12 +1,12 @@
 const API_BASE_URL = 'https://it-skills-matcher-api.onrender.com/api';
 
-export const register = async (email: string, password: string) => {
+export const register = async (username: string, email: string, password: string) => {
   const response = await fetch(`${API_BASE_URL}/auth/register`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ email, password }),
+    body: JSON.stringify({ username, email, password }),
   });
   
   const data = await response.json();
