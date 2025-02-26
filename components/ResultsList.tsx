@@ -64,13 +64,17 @@ export default function ResultsList() {
           setDebugInfo(prev => [...prev, `Total skills loaded: ${Object.keys(courseData).length}`]);
         }
       } catch (error) {
-        setError('Failed to load courses');
-        setDebugInfo(prev => [...prev, `Fatal error: ${error.message}`]);
+        setError("Failed to load courses");
+        if (error instanceof Error) {
+          setDebugInfo((prev) => [...prev, `Fatal error: ${error.message}`]);
+        } else {
+          setDebugInfo((prev) => [...prev, `Fatal error: ${String(error)}`]);
+        }      
       } finally {
         setLoading(false);
       }
     };
-
+    
     fetchCourses();
   }, []);
 
