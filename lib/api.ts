@@ -57,7 +57,7 @@ export const saveSkills = async (skills: string[]) => {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'x-auth-token': token,
+      'Authorization': `Bearer ${token}`,
     },
     body: JSON.stringify({ skills }),
   });
@@ -75,7 +75,7 @@ export const getUserProfile = async () => {
 
   const response = await fetch(`${API_BASE_URL}/auth/profile`, {
     headers: {
-      'x-auth-token': token,
+      'Authorization': `Bearer ${token}`,
     },
   });
   
@@ -92,7 +92,7 @@ export const updateProfile = async (updates: { email?: string; password?: string
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
-      'x-auth-token': token,
+      'Authorization': `Bearer ${token}`,
     },
     body: JSON.stringify(updates),
   });
