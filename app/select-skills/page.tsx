@@ -16,14 +16,17 @@ export default function SelectSkillsPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, token } = useAuth();
 
   useEffect(() => {
-    console.log('Auth state:', { isAuthenticated, isLoading });
+    console.log('SelectSkillsPage - Auth state:', { isAuthenticated, isLoading, token });
+    
+    // Only redirect if we're sure the user is not authenticated
     if (!isLoading && !isAuthenticated) {
+      console.log('Redirecting to login - not authenticated');
       router.push('/login');
     }
-  }, [isAuthenticated, isLoading, router]);
+  }, [isAuthenticated, isLoading, router, token]);
 
   const toggleSkill = (skill: string) => {
     setSelectedSkills(prev => 
@@ -47,14 +50,16 @@ export default function SelectSkillsPage() {
     }
   };
 
+  // Show loading state only during initial auth check
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="text-lg">Loading...</div>
+        <div className="text-lg">Checking authentication...</div>
       </div>
     );
   }
 
+  // Show login message if not authenticated
   if (!isAuthenticated) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -63,6 +68,7 @@ export default function SelectSkillsPage() {
     );
   }
 
+  // Main content
   return (
     <div className="max-w-2xl mx-auto p-8">
       <h1 className="text-3xl font-bold mb-6">Select Your Skills</h1>
@@ -76,8 +82,8 @@ export default function SelectSkillsPage() {
             onClick={() => toggleSkill(skill)}
             className={`p-4 rounded-lg border ${
               selectedSkills.includes(skill)
-                ? 'bg-blue-500 text-white'
-                : 'bg-white hover:bg-gray-50'
+                ? 'bg-blue-500 text-white border-blue-600'
+                : 'bg-white hover:bg-gray-50 border-gray-200'
             }`}
           >
             {skill}

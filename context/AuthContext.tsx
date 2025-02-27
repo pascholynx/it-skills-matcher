@@ -15,7 +15,7 @@ const AuthContext = createContext<AuthContextType>({
   isAuthenticated: false,
   login: () => {},
   logout: () => {},
-  isLoading: true,
+  isLoading: false,
 });
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -24,61 +24,47 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const initAuth = () => {
-      try {
-        const storedToken = localStorage.getItem('token');
-        console.log('Stored token:', storedToken); // Debug log
-        if (storedToken) {
-          setToken(storedToken);
-          setIsAuthenticated(true);
-        }
-      } catch (error) {
-        console.error('Error checking authentication:', error);
-      } finally {
-        setIsLoading(false);
+    setIsLoading(true);
+    try {
+      const storedToken = localStorage.getItem('token');
+      console.log('Initial auth check - token:', storedToken);
+      
+      if (storedToken) {
+        setToken(storedToken);
+        setIsAuthenticated(true);
       }
-    };
-
-    initAuth();
+    } catch (error) {
+      console.error('Auth initialization error:', error);
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
   const login = (newToken: string) => {
-    try {
-      console.log('Setting new token:', newToken); // Debug log
-      localStorage.setItem('token', newToken);
-      setToken(newToken);
-      setIsAuthenticated(true);
-    } catch (error) {
-      console.error('Error during login:', error);
-    }
+    console.log('Login called with token:', newToken);
+    localStorage.setItem('token', newToken);
+    setToken(newToken);
+    setIsAuthenticated(true);
   };
 
   const logout = () => {
-    try {
-      localStorage.removeItem('token');
-      localStorage.removeItem('selectedSkills');
-      setToken(null);
-      setIsAuthenticated(false);
-    } catch (error) {
-      console.error('Error during logout:', error);
-    }
+    localStorage.removeItem('token');
+    localStorage.removeItem('selectedSkills');
+    setToken(null);
+    setIsAuthenticated(false);
   };
-
-  const value = {
-    token,
-    isAuthenticated,
-    login,
-    logout,
-    isLoading
-  };
-
-  console.log('Auth state:', value); // Debug log
 
   return (
-    <AuthContext.Provider value={value}>
+    <AuthContext.Provider value={{ token, isAuthenticated, login, logout, isLoading }}>
       {children}
     </AuthContext.Provider>
   );
 }
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};
