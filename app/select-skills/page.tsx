@@ -19,6 +19,7 @@ export default function SelectSkillsPage() {
   const { isAuthenticated, isLoading } = useAuth();
 
   useEffect(() => {
+    console.log('Auth state:', { isAuthenticated, isLoading });
     if (!isLoading && !isAuthenticated) {
       router.push('/login');
     }
@@ -47,11 +48,19 @@ export default function SelectSkillsPage() {
   };
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-lg">Loading...</div>
+      </div>
+    );
   }
 
   if (!isAuthenticated) {
-    return null;
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-lg">Please log in to continue</div>
+      </div>
+    );
   }
 
   return (

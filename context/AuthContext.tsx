@@ -24,22 +24,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    try {
-      const storedToken = localStorage.getItem('token');
-      if (storedToken) {
-        setToken(storedToken);
-        setIsAuthenticated(true);
+    const initAuth = () => {
+      try {
+        const storedToken = localStorage.getItem('token');
+        console.log('Stored token:', storedToken); // Debug log
+        if (storedToken) {
+          setToken(storedToken);
+          setIsAuthenticated(true);
+        }
+      } catch (error) {
+        console.error('Error checking authentication:', error);
+      } finally {
+        setIsLoading(false);
       }
-    } catch (error) {
-      console.error('Error checking authentication:', error);
-    } finally {
-      setIsLoading(false);
-    }
+    };
+
+    initAuth();
   }, []);
 
-  const login = (token: string) => {
+  const login = (newToken: string) => {
     try {
-      localStorage.setItem('token', token);
+      console.log('Setting new token:', newToken); // Debug log
+      localStorage.setItem('token', newToken);
+      setToken(newToken);
       setIsAuthenticated(true);
     } catch (error) {
       console.error('Error during login:', error);
@@ -57,8 +64,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const value = {
+    token,
+    isAuthenticated,
+    login,
+    logout,
+    isLoading
+  };
+
+  console.log('Auth state:', value); // Debug log
+
   return (
-    <AuthContext.Provider value={{ token, isAuthenticated, login, logout, isLoading }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );

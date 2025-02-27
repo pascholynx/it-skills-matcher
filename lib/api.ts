@@ -53,24 +53,28 @@ export const saveSkills = async (skills: string[]) => {
     throw new Error('No authentication token found');
   }
 
+  console.log('Saving skills with token:', token); // Debug log
+
   const response = await fetch(`${API_BASE_URL}/skills`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'x-auth-token': token,
       'Authorization': `Bearer ${token}`,
+      'x-auth-token': token,
     },
     body: JSON.stringify({ skills }),
   });
   
+  const data = await response.json();
+  console.log('Save skills response:', data); // Debug log
+
   if (!response.ok) {
-    const data = await response.json();
     throw new Error(data.message || 'Failed to save skills');
   }
 
   // Store skills in localStorage
   localStorage.setItem('selectedSkills', JSON.stringify(skills));
-  return await response.json();
+  return data;
 };
 
 export const getUserProfile = async () => {
@@ -80,6 +84,7 @@ export const getUserProfile = async () => {
   const response = await fetch(`${API_BASE_URL}/auth/profile`, {
     headers: {
       'Authorization': `Bearer ${token}`,
+      'x-auth-token': token,
     },
   });
   
