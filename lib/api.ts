@@ -57,16 +57,20 @@ export const saveSkills = async (skills: string[]) => {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      'x-auth-token': token,
       'Authorization': `Bearer ${token}`,
     },
     body: JSON.stringify({ skills }),
   });
   
-  const data = await response.json();
   if (!response.ok) {
+    const data = await response.json();
     throw new Error(data.message || 'Failed to save skills');
   }
-  return data;
+
+  // Store skills in localStorage
+  localStorage.setItem('selectedSkills', JSON.stringify(skills));
+  return await response.json();
 };
 
 export const getUserProfile = async () => {

@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { saveSkills } from '../utils/api';
+import { saveSkills } from '@/lib/api';
 import { Button } from "@/components/ui/button";
+import { useAuth } from '@/context/AuthContext';
 
 const AVAILABLE_SKILLS = [
   'JavaScript', 'Python', 'React', 'Node.js', 'TypeScript',
@@ -13,7 +14,15 @@ const AVAILABLE_SKILLS = [
 export default function SelectSkillsPage() {
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const { isAuthenticated, isLoading } = useAuth();
+
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      router.push('/login');
+    }
+  }, [isAuthenticated, isLoading, router]);
 
   const toggleSkill = (skill: string) => {
     setSelectedSkills(prev => 
@@ -25,12 +34,25 @@ export default function SelectSkillsPage() {
 
   const handleSubmit = async () => {
     try {
+      setLoading(true);
+      setError('');
       await saveSkills(selectedSkills);
       router.push('/results');
     } catch (err) {
+      console.error('Error saving skills:', err);
       setError(err instanceof Error ? err.message : 'Failed to save skills');
+    } finally {
+      setLoading(false);
     }
   };
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (!isAuthenticated) {
+    return null;
+  }
 
   return (
     <div className="max-w-2xl mx-auto p-8">
@@ -41,6 +63,7 @@ export default function SelectSkillsPage() {
         {AVAILABLE_SKILLS.map(skill => (
           <button
             key={skill}
+            type="button"
             onClick={() => toggleSkill(skill)}
             className={`p-4 rounded-lg border ${
               selectedSkills.includes(skill)
@@ -57,10 +80,10 @@ export default function SelectSkillsPage() {
       
       <Button 
         onClick={handleSubmit}
-        disabled={selectedSkills.length === 0}
+        disabled={selectedSkills.length === 0 || loading}
         className="w-full"
       >
-        Continue to Resources
+        {loading ? 'Saving...' : 'Continue to Resources'}
       </Button>
     </div>
   );
