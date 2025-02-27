@@ -3,40 +3,65 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 interface AuthContextType {
+  token: string | null;
   isAuthenticated: boolean;
   login: (token: string) => void;
   logout: () => void;
+  isLoading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType>({
+  token: null,
   isAuthenticated: false,
   login: () => {},
   logout: () => {},
+  isLoading: true,
 });
 
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
+export function AuthProvider({ children }: { children: ReactNode }) {
+  const [token, setToken] = useState<string | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    setIsAuthenticated(!!token);
+    try {
+      const storedToken = localStorage.getItem('token');
+      if (storedToken) {
+        setToken(storedToken);
+        setIsAuthenticated(true);
+      }
+    } catch (error) {
+      console.error('Error checking authentication:', error);
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
   const login = (token: string) => {
-    localStorage.setItem('token', token);
-    setIsAuthenticated(true);
+    try {
+      localStorage.setItem('token', token);
+      setIsAuthenticated(true);
+    } catch (error) {
+      console.error('Error during login:', error);
+    }
   };
 
   const logout = () => {
-    localStorage.removeItem('token');
-    setIsAuthenticated(false);
+    try {
+      localStorage.removeItem('token');
+      localStorage.removeItem('selectedSkills');
+      setToken(null);
+      setIsAuthenticated(false);
+    } catch (error) {
+      console.error('Error during logout:', error);
+    }
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
+    <AuthContext.Provider value={{ token, isAuthenticated, login, logout, isLoading }}>
       {children}
     </AuthContext.Provider>
   );
-};
+}
 
-export const useAuth = () => useContext(AuthContext); 
+export const useAuth = () => useContext(AuthContext);

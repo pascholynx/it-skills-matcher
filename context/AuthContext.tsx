@@ -37,10 +37,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const login = (newToken: string) => {
+  const login = (token: string) => {
     try {
-      localStorage.setItem('token', newToken);
-      setToken(newToken);
+      localStorage.setItem('token', token);
       setIsAuthenticated(true);
     } catch (error) {
       console.error('Error during login:', error);
